@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-4.2.xsd 
+http://www.springframework.org/schema/context 
+http://www.springframework.org/schema/context/spring-context-4.2.xsd 
+http://www.springframework.org/schema/tx 
+http://www.springframework.org/schema/tx/spring-tx-4.2.xsd 
+http://www.springframework.org/schema/util 
+http://www.springframework.org/schema/util/spring-util-4.2.xsd 
+http://www.springframework.org/schema/aop 
+http://www.springframework.org/schema/aop/spring-aop-4.2.xsd 
+http://www.springframework.org/schema/cache 
+http://www.springframework.org/schema/cache/spring-cache-4.2.xsd
+">
+
+	<!-- 本配置文件用于整合spring+mybatis 1、扫描包 <context:component-scan base-package="" 
+		/> 2、jdbc配置地址 <context:property-placeholder location="" /> 3、配置datasource 
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource" 4、加载sqlsessionfactory 
+		class="org.apache.ibatis.session.SqlSessionFactory" 5、加载org.mybatis.spring.mapper.MapperScannerConfigurer模式 -->
+
+	<!-- 地址 -->
+	<context:property-placeholder location="classpath:jdbc.properties" />
+
+	<!-- 1、配置数据源 -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+
+	<!-- 2、配置mybatis的工厂 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 工厂所需数据源关联 -->
+		<property name="dataSource" ref="dataSource" />
+		<!-- MyBatis全局配置文件 -->
+		<property name="configLocation" value="classpath:mybatis-config.xml" />
+		<!-- 持久层映射文件 用List配置多个mapper路径 *Mapper.xml表示以Mapper.xml结尾的文件 -->
+		<property name="mapperLocations">
+			<list>
+				<value>classpath:com/ssmdemo/mapper/*.xml</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- DAO接口所在包。通过mapperCannerConfigurer模式，在mybatis-spring JAR包下 两个参数 basePackage 
+		sqlSessionFactoryBeanName -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.ssmdemo.dao" />
+	</bean>
+
+
+	<!-- 资源文件配置 自定义类 这个有什么用？ -->
+	<!-- <bean id="propertyBean" class="com.ssmdemo.util.PropertyConfig">
+		<property name="locations">
+			<list>
+				<value>classpath:system-config.properties</value>
+				<value>classpath:properties-*.properties</value>
+			</list>
+		</property>
+	</bean> -->
+
+	<!-- 日志配置 -->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:log4j.properties</value>
+			</list>
+		</property>
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+	</bean>
+
+</beans>
